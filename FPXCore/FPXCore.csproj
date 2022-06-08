@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FPX.ComponentModel\FPX.ComponentModel.csproj" />
+    <ProjectReference Include="D:\Visual Studio Projects\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
+  </ItemGroup>
+
+</Project>
