@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -7,6 +7,7 @@ using System.Security.Permissions;
 using System.Reflection;
 using System.Windows;
 using FPX.ComponentModel;
+using FPX.Editor;
 
 using Application = System.Windows.Forms.Application;
 
@@ -27,6 +28,7 @@ namespace FPX
             Title();
             Settings.Initialize();
             uint frame = 0;
+
             while (Running)
             {
                 Debug.Log(DateTime.Now);
@@ -37,7 +39,7 @@ namespace FPX
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(">");
-                if (args.Length >= 2 && frame == 0)
+                if (args.Length >= 1 && frame == 0)
                 {
                     args.ToList().ForEach(a => Console.Write(a + " "));
                     Console.WriteLine();
@@ -56,6 +58,8 @@ namespace FPX
                         continue;
 
                     string[] pragma = line.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (pragma.Length == 0)
+                        continue;
                     string command = pragma[0];
                     var arguments = new string[pragma.Length - 1];
                     for (int i = 0; i < arguments.Length; i++)
@@ -141,6 +145,7 @@ namespace FPX
 
         public static void Run()
         {
+            Application.SetCompatibleTextRenderingDefault(true);
             GameCore.Run();
         }
 
@@ -151,42 +156,31 @@ namespace FPX
 
         public static void Editor()
         {
-            Debug.BackgroundColor = ConsoleColor.Blue;
-            Debug.Log("EDITOR");
-            Debug.ResetColors();
-
-            Application.EnableVisualStyles();
-            try
-            {
-                Application.SetCompatibleTextRenderingDefault(true);
-            }
-            catch (InvalidOperationException) { }
-
-            Application.Run(new GameForm());
+            GameCore.Editor();
         }
 
-        //public static void Editor(string sceneName)
-        //{
-        //    try
-        //    {
-        //        Application.EnableVisualStyles();
-        //        Application.SetCompatibleTextRenderingDefault(true);
-        //    }
-        //    catch (Exception) { }
+        public static void Editor(string sceneName)
+        {
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(true);
+            }
+            catch (Exception) { }
 
-        //    Application.Run(new FPXCore.MicrosoftUIWindow(sceneName));
-        //}
+            Application.Run(new EditorWindow(sceneName));
+        }
 
         public static void Close()
         {
             Running = false;
         }
 
-        //public static void SetRendererMode(string Mode)
-        //{
-        //    Graphics.Mode = Mode;
-        //    Debug.Log("Set mode to {0}", Mode);
-        //}
+        public static void SetRendererMode(string Mode)
+        {
+            Graphics.Mode = (Graphics.RenderMode)Enum.Parse(typeof(Graphics.RenderMode), Mode);
+            Debug.Log("Set mode to {0}", Mode);
+        }
 
         public static void SetStringSetting(string name, string value)
         {

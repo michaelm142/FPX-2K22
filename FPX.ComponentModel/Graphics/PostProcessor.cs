@@ -34,7 +34,9 @@ namespace FPX.Visual
 
         public void End()
         {
-            GameCore.graphicsDevice.SetRenderTarget(null);
+            for (int i = 0; i < 4; i++)
+                GameCore.graphicsDevice.SetRenderTarget((RenderTarget2D)null, 0);
+
             GameCore.graphicsDevice.Clear(Color.LightBlue);
             var prevRasterState = GameCore.graphicsDevice.RasterizerState;
             var prevBlendState = GameCore.graphicsDevice.BlendState;
@@ -49,7 +51,7 @@ namespace FPX.Visual
                 if (imageSizeParam != null)
                     imageSizeParam.SetValue(new Vector2(renderTarget.Width, renderTarget.Height));
 
-                QuadRenderer.Instance.RenderQuad(renderTarget, new Rectangle(0, 0, Screen.Width / 2, -Screen.Height / 2), layer);
+                QuadRenderer.RenderQuad(renderTarget, new Rectangle(0, 0, Screen.Width / 2, -Screen.Height / 2), layer);
             }
 
             GameCore.graphicsDevice.RasterizerState = prevRasterState;

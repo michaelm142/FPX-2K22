@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+  
+  <Physics>
+    <TimeScale>1.0</TimeScale>
+    <MaxPhysIterations>8</MaxPhysIterations>
+  </Physics>
+  
+  <FullScreen>false</FullScreen>
+  <ScreenWidth>1200</ScreenWidth>
+  <ScreenHeight>800</ScreenHeight>
+  <ControllerInput>One</ControllerInput>
+  <FillMode Type="Microsoft.Xna.Framework.Graphics.PrimitiveType, Monogame.Framework">TriangleList</FillMode>
+  <RenderMode>Deferred</RenderMode>
+  
+  <Input>
+    <Axis Name="Horizontal" Platform="GamePad" Axis="LeftThumbStickX" DeadZone="0.1"/>
+    <Axis Name="Vertical" Platform="GamePad" Axis="LeftThumbStickY" DeadZone="0.1"/>
+    <Axis Name="Up" Platform="GamePad" Axis="RightTrigger"/>
+    <Axis Name="Down" Platform="GamePad" Axis="LeftTrigger" Invert="true"/>
+    <Axis Name="2D Horizontal" Platform="Keyboard" PositiveButton="Right" NegitiveButton="Left" Sensitivity="0.2" Gravity="0.9"/>
+    <Axis Name="2D Vertical" Platform="Keyboard" PositiveButton="Down" NegitiveButton="Up" Sensitivity="0.2" Gravity="0.2"/>
+    <Axis Name="Yaw" Platform="GamePad" Axis="RightThumbStickX" DeadZone="0.1" Invert="true"/>
+    <Axis Name="Pitch" Platform="GamePad" Axis="RightThumbStickY" DeadZone="0.1"/>
+  </Input>
+  
+</Settings>

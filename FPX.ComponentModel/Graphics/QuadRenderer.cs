@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using FPX.ComponentModel;
 
-namespace FPX.Visual
+namespace FPX
 {
     public class QuadRenderer : IGameComponent
     {
-        public static QuadRenderer Instance { get; private set; }
+        static QuadRenderer Instance { get; set; }
 
         VertexPositionTexture[] vertecies;
+        public static VertexPositionTexture[] QuadVertecies { get { return Instance.vertecies; } }
 
         BasicEffect basicEffect;
 
@@ -40,13 +36,13 @@ namespace FPX.Visual
             basicEffect.TextureEnabled = true;
         }
 
-        public void RenderQuad(Texture2D texture, Vector2 position, Color blendColor)
+        public void RenderQuad(Texture2D texture, Vector3 position, Color blendColor)
         {
             GraphicsDevice device = GameCore.graphicsDevice;
 
             basicEffect.Texture = texture;
             basicEffect.DiffuseColor = blendColor.ToVector3();
-            basicEffect.World = Matrix.CreateTranslation(-0.5f, -0.5f, 0.0f) * Matrix.CreateScale(texture.Width, texture.Height, 1.0f) * Matrix.CreateTranslation(position.ToVector3());
+            basicEffect.World = Matrix.CreateTranslation(-0.5f, -0.5f, 0.0f) * Matrix.CreateScale(texture.Width, texture.Height, 1.0f) * Matrix.CreateTranslation(position);
             basicEffect.View = Matrix.Identity;
             basicEffect.Projection = Matrix.CreateOrthographic(device.Viewport.Width, device.Viewport.Height, 0.0f, 1.0f);
             basicEffect.CurrentTechnique.Passes[0].Apply();
@@ -54,7 +50,7 @@ namespace FPX.Visual
             device.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertecies, 0, 2);
         }
 
-        public void RenderQuad(Texture2D texture, Vector2 position, Effect effect, bool useWVPPrams = true)
+        public void _renderQuad(Texture2D texture, Vector3 position, Effect effect, bool useWVPPrams = true)
         {
             GraphicsDevice device = GameCore.graphicsDevice;
 
@@ -62,16 +58,21 @@ namespace FPX.Visual
             device.Textures[0] = texture;
             if (useWVPPrams)
             {
-                effect.Parameters["World"].SetValue(Matrix.CreateTranslation(position.ToVector3()));
-                effect.Parameters["View"].SetValue(Matrix.Identity);
-                effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographic(device.Viewport.Width, device.Viewport.Height, 0.0f, 1.0f));
+                effect.Parameters["World"].SetValue(Matrix.CreateTranslation(position));
+                if (effect.Parameters["View"] != null)
+                {
+                    effect.Parameters["View"].SetValue(Matrix.Identity);
+                    effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographic(Screen.Width, Screen.Height, 0.0f, 1.0f));
+                }
+                else if (effect.Parameters["WorldViewProj"] != null)
+                    effect.Parameters["WorldViewProj"].SetValue(Matrix.CreateOrthographic(Screen.Width, Screen.Height, 0.0f, 1.0f));
             }
             effect.CurrentTechnique.Passes[0].Apply();
 
             device.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertecies, 0, 2);
         }
 
-        public void RenderQuad(Texture2D texture, Rectangle rect, Effect effect, bool useWVPPrams = true)
+        public void _renderQuad(Texture2D texture, Rectangle rect, Effect effect, bool useWVPPrams = true)
         {
             GraphicsDevice device = GameCore.graphicsDevice;
 
@@ -81,27 +82,47 @@ namespace FPX.Visual
             if (useWVPPrams)
             {
                 effect.Parameters["World"].SetValue(Matrix.CreateScale(rect.Width, rect.Height, 1.0f) * Matrix.CreateTranslation(rect.Location.ToVector2().ToVector3()));
-                effect.Parameters["View"].SetValue(Matrix.Identity);
-                effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographic(device.Viewport.Width, device.Viewport.Height, -1.0f, 1.0f));
+                if (effect.Parameters["View"] != null)
+                {
+                    effect.Parameters["View"].SetValue(Matrix.Identity);
+                    effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographic(Screen.Width, Screen.Height, 0.0f, 1.0f));
+                }
+                else if (effect.Parameters["WorldViewProj"] != null)
+                    effect.Parameters["WorldViewProj"].SetValue(Matrix.CreateOrthographic(Screen.Width, Screen.Height, 0.0f, 1.0f));
             }
             effect.CurrentTechnique.Passes[0].Apply();
 
             device.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertecies, 0, 2);
         }
 
-        public void RenderQuad(Texture2D texture, Rectangle rect, Color blendColor)
+        public void _renderQuad(Texture2D texture, Rectangle rect, Color blendColor)
         {
             GraphicsDevice device = GameCore.graphicsDevice;
 
             basicEffect.Texture = texture;
             basicEffect.DiffuseColor = blendColor.ToVector3();
             basicEffect.Alpha = blendColor.A / 255.0f;
-            basicEffect.World = Matrix.CreateScale(rect.Width / 2.0f, rect.Height / 2.0f, 1.0f) * Matrix.CreateTranslation(rect.Location.ToVector2().ToVector3());
+            basicEffect.World = Matrix.CreateScale(rect.Width, rect.Height, 1.0f) * Matrix.CreateTranslation(rect.Location.ToVector2().ToVector3());
             basicEffect.View = Matrix.Identity;
             basicEffect.Projection = Matrix.CreateOrthographic(device.Viewport.Width, device.Viewport.Height, 0.0f, 1.0f);
             basicEffect.CurrentTechnique.Passes[0].Apply();
 
             device.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertecies, 0, 2);
+        }
+
+        public static void RenderQuad(Texture2D texture, Rectangle rect, Color blendColor)
+        {
+            Instance._renderQuad(texture, rect, blendColor);
+        }
+
+        public static void RenderQuad(Texture2D texture, Rectangle rect, Effect effect, bool useWFPPrams = true)
+        {
+            Instance._renderQuad(texture, rect, effect != null ? effect : Instance.basicEffect, useWFPPrams);
+        }
+
+        public static void RenderQuad(Texture2D texture, Vector3 position, Effect effect, bool useWVPPrams = true)
+        {
+            Instance._renderQuad(texture, position, effect != null ? effect : Instance.basicEffect, useWVPPrams);
         }
     }
 }

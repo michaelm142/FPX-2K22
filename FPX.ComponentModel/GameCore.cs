@@ -11,13 +11,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using FPX.ComponentModel;
 using FPX.Visual;
+using FPX.Editor;
 
 namespace FPX
 {
-    public class GameCore
+    public static class GameCore
     {
-        public static GameCore Instance { get; private set; }
-
+        public static GameForm Window { get; private set; }
         public static Game gameInstance { get; private set; }
 
         public static SpriteBatch spriteBatch { get; set; }
@@ -72,10 +72,11 @@ namespace FPX
 
             gameInstance.Exiting += GameInstance_Exiting;
 
-            //gameInstance.Components.Add(new Time());
-            //gameInstance.Components.Add(new Physics());
-            //gameInstance.Components.Add(new Graphics());
+            gameInstance.Components.Add(new Time());
+            gameInstance.Components.Add(new Physics());
+            gameInstance.Components.Add(new Graphics());
             //gameInstance.Components.Add(new Input());
+            //AssetManager.Initialize();
 
             gameInstance.Activated += Outval_Activated;
 
@@ -97,53 +98,17 @@ namespace FPX
         }
 
         [STAThread]
-        public static void Run(IntPtr? windowHandle = null)
+        public static void Run()
         {
             Debug.BackgroundColor = ConsoleColor.Red;
             Debug.Log("ENGINE LAUNCH");
             Debug.ResetColors();
 
-            if (windowHandle == null)
-            {
-                GameForm form = new GameForm();
-                form.Width = Settings.GetSetting<int>("ScreenWidth");
-                form.Height = Settings.GetSetting<int>("ScreenHeight");
-                form.Show();
-                windowHandle = form.Handle;
-            }
-
-
-            // Thread t = new Thread(new ParameterizedThreadStart(GameLoop));
-            // t.Start(windowHandle);
-            WaitCallback callback = new WaitCallback(GameLoop);
-            ThreadPool.QueueUserWorkItem(callback, windowHandle);
-        }
-
-        public static void LoadScene(string sceneName)
-        {
-            if (!IsRunning || gameInstance == null)
-            {
-                Debug.LogError("Engine is not currently running");
-                return;
-            }
-
-            Scene scene = new Scene();
-            scene.sceneName = sceneName;
-            scene.Initialize();
-            scene.Load();
-
-            gameInstance.Components.Add(scene);
-        }
-
-        private static void GameLoop(object param)
-        {
-            IntPtr windowHandle = param == null ? IntPtr.Zero : (IntPtr)param;
 
             IsRunning = true;
-            using (Game gameInstance = CreateGameInstance(windowHandle))
+            using (Game gameInstance = CreateGameInstance())
             {
-                while (IsRunning)
-                    gameInstance.RunOneFrame();
+                gameInstance.Run();
             }
 
             Camera.Active = null;
@@ -155,5 +120,66 @@ namespace FPX
             Debug.Log("Engine Shutdown");
             Debug.ResetColors();
         }
+
+
+        public static void LoadScene(string sceneName)
+        {
+            Debug.BackgroundColor = ConsoleColor.Red;
+            Debug.Log("ENGINE LAUNCH");
+            Debug.ResetColors();
+
+
+            IsRunning = true;
+            using (Game gameInstance = CreateGameInstance())
+            {
+                Scene scene = new Scene();
+                scene.sceneName = sceneName;
+                scene.Load();
+
+                gameInstance.Components.Add(scene);
+                gameInstance.Run();
+            }
+
+            Camera.Active = null;
+            Settings.ShutDown();
+            Debug.DumpLog();
+
+            Debug.BackgroundColor = ConsoleColor.DarkGray;
+            Debug.ForegroundColor = ConsoleColor.Black;
+            Debug.Log("Engine Shutdown");
+            Debug.ResetColors();
+        }
+
+        public static void Editor()
+        {
+            Debug.BackgroundColor = ConsoleColor.Red;
+            Debug.Log("ENGINE LAUNCH");
+            Debug.ResetColors();
+
+
+            IsRunning = true;
+            using (Game gameInstance = CreateGameInstance())
+            {
+                //gameInstance.Components.Add(new FPX.Editor());
+                gameInstance.IsMouseVisible = true;
+                gameInstance.Run();
+            }
+
+            Camera.Active = null;
+            Settings.ShutDown();
+            Debug.DumpLog();
+
+            Debug.BackgroundColor = ConsoleColor.DarkGray;
+            Debug.ForegroundColor = ConsoleColor.Black;
+            Debug.Log("Engine Shutdown");
+            Debug.ResetColors();
+        }
+
+        private static void GameLoop(object param)
+        {
+
+        }
+        delegate void UpdateGameForm();
     }
+
 }
